@@ -16,7 +16,8 @@ try:
     from pygments import lex
     from pygments.lexers import (
         PythonLexer, CLexer, CppLexer, HtmlLexer, CssLexer, JavascriptLexer,
-        RustLexer, JavaLexer, LuaLexer, TypeScriptLexer, GoLexer
+        RustLexer, JavaLexer, LuaLexer, TypeScriptLexer, GoLexer, 
+        CSharpLexer, RubyLexer, KotlinLexer, NixLexer
     )
     from pygments.token import Token
     USE_PYGMENTS = True
@@ -25,7 +26,7 @@ except Exception:
 
 APP_TITLE = "Vanilla Studio IDE"
 
-# default extension mapping by language
+# default extension mapping by language 
 LANG_EXT = {
     "python": ".py",
     "c": ".c",
@@ -34,12 +35,19 @@ LANG_EXT = {
     "css": ".css",
     "javascript": ".js",
     "js": ".js",
-    "typescript": ".ts",
+    "typescript": ".ts", 
     "ts": ".ts",
     "rust": ".rs",
     "java": ".java",
     "lua": ".lua",
     "go": ".go",
+    "csharp": ".cs",
+    "cs": ".cs",
+    "ruby": ".rb",
+    "rb": ".rb",
+    "kotlin": ".kt",
+    "kt": ".kt",
+    "nix": ".nix",
 }
 
 # ---------------------------
@@ -237,6 +245,14 @@ class EditorTab:
             "java": JavaLexer(),
             "lua": LuaLexer(),
             "go": GoLexer(),
+            # Add new lexers
+            "csharp": CSharpLexer(),
+            "cs": CSharpLexer(),
+            "ruby": RubyLexer(),
+            "rb": RubyLexer(),
+            "kotlin": KotlinLexer(),
+            "kt": KotlinLexer(),
+            "nix": NixLexer(),
         }
         lexer = lexers.get(self.language, PythonLexer())
 
@@ -285,14 +301,31 @@ class EditorTab:
             keywords = r"\b(?:def|class|if|else|elif|for|while|try|except|finally|with|as|import|from|return|in|is|and|or|not|lambda|pass|break|continue|yield|global|nonlocal|assert|del)\b"
             for m in re.finditer(keywords, content):
                 self._tag_range("kw", m.start(), m.end(), content)
-        elif lang in ("c", "cpp", "c++", "rust", "java", "go"):
+        elif lang in ("c", "cpp", "c++", "rust", "java", "go", "csharp", "cs", "kotlin", "kt"):  # Added C# and Kotlin
             for m in re.finditer(r"//.*", content):
                 self._tag_range("comment", m.start(), m.end(), content)
             for m in re.finditer(r"/\*.*?\*/", content, flags=re.S):
                 self._tag_range("comment", m.start(), m.end(), content)
             for m in re.finditer(r"\".*?\"|'.*?'", content, flags=re.S):
                 self._tag_range("string", m.start(), m.end(), content)
-            keywords = r"\b(?:int|char|float|double|void|if|else|for|while|do|switch|case|break|continue|return|struct|typedef|enum|const|static|extern|sizeof|class|public|private|protected|using|namespace|package|import|func|let|var|impl|trait|fn|match|mod|println|println!)\b"
+            # Extended keywords for C# and Kotlin
+            keywords = r"\b(?:int|char|float|double|void|if|else|for|while|do|switch|case|break|continue|return|struct|typedef|enum|const|static|extern|sizeof|class|public|private|protected|using|namespace|package|import|func|let|var|impl|trait|fn|match|mod|println|println!|string|bool|interface|virtual|override|sealed|abstract|readonly|async|await|fun|val|suspend|companion|object|init|constructor|internal|open|final|data|get|set)\b"
+            for m in re.finditer(keywords, content):
+                self._tag_range("kw", m.start(), m.end(), content)
+        elif lang in ("ruby", "rb"):  # Add Ruby highlighting
+            for m in re.finditer(r"#.*", content):
+                self._tag_range("comment", m.start(), m.end(), content)
+            for m in re.finditer(r"(\"\"\".*?\"\"\"|'''.*?'''|\".*?\"|'.*?'|%[qQ]?\{.*?\}|%[qQ]?\[.*?\])", content, flags=re.S):
+                self._tag_range("string", m.start(), m.end(), content)
+            keywords = r"\b(?:def|class|if|else|elsif|end|unless|case|when|while|until|for|in|do|module|begin|rescue|ensure|yield|return|super|self|nil|true|false|and|or|not|alias|undef|BEGIN|END)\b"
+            for m in re.finditer(keywords, content):
+                self._tag_range("kw", m.start(), m.end(), content)
+        elif lang == "nix":  # Add Nix highlighting
+            for m in re.finditer(r"#.*", content):
+                self._tag_range("comment", m.start(), m.end(), content)
+            for m in re.finditer(r"\".*?\"|''.*?''", content, flags=re.S):
+                self._tag_range("string", m.start(), m.end(), content)
+            keywords = r"\b(?:let|in|rec|with|inherit|or|import|importall|builtins|null|true|false|mkDerivation|mkShell|fetchFromGitHub|stdenv|lib|pkgs)\b"
             for m in re.finditer(keywords, content):
                 self._tag_range("kw", m.start(), m.end(), content)
         elif lang in ("html", "htm"):
@@ -505,7 +538,10 @@ class EditorTab:
             "java": "// New Java\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello from Vanilla Studio\");\n    }\n}\n",
             "lua": "-- New Lua\nprint('Hello from Vanilla Studio')\n",
             "go": "// New Go\npackage main\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello from Vanilla Studio\")\n}\n",
-            "js": "// New JavaScript\nconsole.log('Hello from Vanilla Studio');\n",
+            "csharp": "// New C#\nusing System;\nclass Program {\n    static void Main() {\n        Console.WriteLine(\"Hello from Vanilla Studio\");\n    }\n}\n",
+            "ruby": "# New Ruby\nputs 'Hello from Vanilla Studio'\n",
+            "kotlin": "// New Kotlin\nfun main() {\n    println(\"Hello from Vanilla Studio\")\n}\n",
+            "nix": "# New Nix\n{ pkgs ? import <nixpkgs> {} }:\n\nwith pkgs;\n\nmkShell {\n  buildInputs = [\n    # Add your dependencies here\n  ];\n}\n",
         }
         return samples.get(self.language, "")
 
@@ -590,7 +626,9 @@ class VanillaStudioApp:
         lang_label = ttk.Label(toolbar, text="Language:")
         self.lang_var = tk.StringVar(value="python")
         self.lang_box = ttk.Combobox(toolbar, textvariable=self.lang_var,
-                                     values=["python","c","cpp","html","css","javascript","typescript","rust","java","lua","go"], width=12)
+                                     values=["Python","C","C++","HTML","CSS","JavaScript",
+                                             "TypeScript","Rust","Java","Lua","Go","C#",
+                                             "Ruby","Kotlin","Nix"], width=12)
         new_btn.pack(side="left", padx=2, pady=2)
         open_btn.pack(side="left", padx=2, pady=2)
         save_btn.pack(side="left", padx=2, pady=2)
@@ -999,6 +1037,48 @@ class VanillaStudioApp:
                 elif lang in ("html", "htm", "css"):
                     webbrowser.open(str(tab.filepath.resolve().as_uri()))
                     self.append_console(f"Opened {tab.filepath} in default browser.\n")
+                elif lang == "csharp":
+                    if which("dotnet"):
+                        # Create temporary project if needed
+                        proj_dir = tab.filepath.parent
+                        if not (proj_dir / "project.csproj").exists():
+                            code, out, err = safe_run_subprocess(["dotnet", "new", "console", "-o", "."], cwd=str(proj_dir))
+                        code, out, err = safe_run_subprocess(["dotnet", "run"], cwd=str(proj_dir))
+                        if out: self.append_console(out)
+                        if err: self.append_console(err)
+                    else:
+                        self.append_console(".NET SDK not found in PATH.\n")
+                elif lang == "ruby":
+                    if which("ruby"):
+                        code, out, err = safe_run_subprocess(["ruby", str(tab.filepath)], cwd=str(tab.filepath.parent))
+                        if out: self.append_console(out)
+                        if err: self.append_console(err)
+                    else:
+                        self.append_console("Ruby not found in PATH.\n")
+                elif lang == "kotlin":
+                    if which("kotlinc"):
+                        # Compile and run using kotlinc
+                        code, out, err = safe_run_subprocess(["kotlinc", str(tab.filepath), "-include-runtime", "-d", "out.jar"], 
+                                                           cwd=str(tab.filepath.parent))
+                        if code != 0:
+                            if out: self.append_console(out)
+                            if err: self.append_console(err)
+                            return
+                        code, out, err = safe_run_subprocess(["java", "-jar", "out.jar"], cwd=str(tab.filepath.parent))
+                        if out: self.append_console(out)
+                        if err: self.append_console(err)
+                    else:
+                        self.append_console("Kotlin compiler not found in PATH.\n")
+                elif lang == "nix":
+                    if which("nix"):
+                        if tab.filepath.name == "flake.nix":
+                            code, out, err = safe_run_subprocess(["nix", "develop", "."], cwd=str(tab.filepath.parent))
+                        else:
+                            code, out, err = safe_run_subprocess(["nix-shell", str(tab.filepath)], cwd=str(tab.filepath.parent))
+                        if out: self.append_console(out)
+                        if err: self.append_console(err)
+                    else:
+                        self.append_console("Nix not found in PATH.\n")
                 else:
                     self.append_console("Unknown language: cannot run.\n")
             except Exception as e:
