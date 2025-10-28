@@ -28,26 +28,26 @@ APP_TITLE = "Vanilla Studio IDE"
 
 # default extension mapping by language 
 LANG_EXT = {
-    "python": ".py",
-    "c": ".c",
-    "cpp": ".cpp",
-    "html": ".html",
-    "css": ".css",
-    "javascript": ".js",
+    "Python": ".py",
+    "C": ".c",
+    "C++": ".cpp",
+    "HTML": ".html",
+    "CSS": ".css",
+    "JavaScript": ".js",
     "js": ".js",
-    "typescript": ".ts", 
+    "TypeScript": ".ts", 
     "ts": ".ts",
-    "rust": ".rs",
-    "java": ".java",
-    "lua": ".lua",
-    "go": ".go",
-    "csharp": ".cs",
+    "Rust": ".rs",
+    "Java": ".java",
+    "Lua": ".lua",
+    "Go": ".go",
+    "C#": ".cs",
     "cs": ".cs",
-    "ruby": ".rb",
+    "Ruby": ".rb",
     "rb": ".rb",
-    "kotlin": ".kt",
+    "Kotlin": ".kt",
     "kt": ".kt",
-    "nix": ".nix",
+    "Nix": ".nix",
 }
 
 # ---------------------------
@@ -245,9 +245,9 @@ class EditorTab:
             "java": JavaLexer(),
             "lua": LuaLexer(),
             "go": GoLexer(),
-            # Add new lexers
             "csharp": CSharpLexer(),
             "cs": CSharpLexer(),
+            "c#": CSharpLexer(),
             "ruby": RubyLexer(),
             "rb": RubyLexer(),
             "kotlin": KotlinLexer(),
@@ -301,7 +301,7 @@ class EditorTab:
             keywords = r"\b(?:def|class|if|else|elif|for|while|try|except|finally|with|as|import|from|return|in|is|and|or|not|lambda|pass|break|continue|yield|global|nonlocal|assert|del)\b"
             for m in re.finditer(keywords, content):
                 self._tag_range("kw", m.start(), m.end(), content)
-        elif lang in ("c", "cpp", "c++", "rust", "java", "go", "csharp", "cs", "kotlin", "kt"):  # Added C# and Kotlin
+        elif lang in ("c", "cpp", "c++", "rust", "java", "go", "csharp", "cs", "c#", "kotlin", "kt"):  # Added C# and Kotlin
             for m in re.finditer(r"//.*", content):
                 self._tag_range("comment", m.start(), m.end(), content)
             for m in re.finditer(r"/\*.*?\*/", content, flags=re.S):
@@ -529,7 +529,7 @@ class EditorTab:
         samples = {
             "python": "# New Python file\n\nif __name__ == '__main__':\n    print('Hello from Vanilla Studio')\n",
             "c": "/* New C file */\n#include <stdio.h>\n\nint main() {\n    printf(\"Hello, C from Vanilla Studio!\\n\");\n    return 0;\n}\n",
-            "cpp": "// New C++ file\n#include <iostream>\nusing namespace std;\nint main(){\n    cout << \"Hello, C++ from Vanilla Studio!\" << endl;\n    return 0;\n}\n",
+            "c++": "// New C++ file\n#include <iostream>\nusing namespace std;\nint main(){\n    cout << \"Hello, C++ from Vanilla Studio!\" << endl;\n    return 0;\n}\n",
             "html": "<!doctype html>\n<html>\n  <head><meta charset=\"utf-8\"><title>Vanilla Studio</title></head>\n  <body>\n    <h1>Hello from Vanilla Studio</h1>\n  </body>\n</html>\n",
             "css": "/* New CSS */\nbody { font-family: sans-serif; background: #fff; color: #111; }\n",
             "javascript": "// New JavaScript\nconsole.log('Hello from Vanilla Studio');\n",
@@ -538,7 +538,7 @@ class EditorTab:
             "java": "// New Java\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello from Vanilla Studio\");\n    }\n}\n",
             "lua": "-- New Lua\nprint('Hello from Vanilla Studio')\n",
             "go": "// New Go\npackage main\nimport \"fmt\"\nfunc main() {\n    fmt.Println(\"Hello from Vanilla Studio\")\n}\n",
-            "csharp": "// New C#\nusing System;\nclass Program {\n    static void Main() {\n        Console.WriteLine(\"Hello from Vanilla Studio\");\n    }\n}\n",
+            "c#": "// New C#\nusing System;\nclass Program {\n    static void Main() {\n        Console.WriteLine(\"Hello from Vanilla Studio\");\n    }\n}\n",
             "ruby": "# New Ruby\nputs 'Hello from Vanilla Studio'\n",
             "kotlin": "// New Kotlin\nfun main() {\n    println(\"Hello from Vanilla Studio\")\n}\n",
             "nix": "# New Nix\n{ pkgs ? import <nixpkgs> {} }:\n\nwith pkgs;\n\nmkShell {\n  buildInputs = [\n    # Add your dependencies here\n  ];\n}\n",
@@ -1125,7 +1125,7 @@ class VanillaStudioApp:
         tab.text.see(start)
 
     def show_about(self):
-        messagebox.showinfo("About Vanilla Studio", "Vanilla Studio IDE\nA beginner-friendly IDE\nSupports: Python, C, C++, HTML, CSS, JavaScript, TypeScript, Rust, Java, Lua, Go\nCreated with ♥ by Camila Rose")
+        messagebox.showinfo("About Vanilla Studio", "Vanilla Studio IDE 2.1\nA beginner-friendly IDE\nSupports: Python, C, C++, HTML, CSS, JavaScript, TypeScript, Rust, Java, Lua, Go, Ruby, Kotlin and Nix\nCreated with ♥ by Camila Rose")
 
 # ---------------------------
 # Run application
